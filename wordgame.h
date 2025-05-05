@@ -1,0 +1,57 @@
+#ifndef WORDGAME_H
+#define WORDGAME_H
+
+#include <windows.h>
+
+// Constants
+#define PIPE_BUFFER_SIZE 2048
+#define USERNAME_SIZE 21
+#define MAX_PLAYERS 20
+#define MAX_LETTERS 6
+#define RHYTHM 3
+#define DICTIONARY_SIZE 50
+#define WORD_SIZE 21
+
+// Registry Keys
+#define REGISTRY_KEY _T("Software\\TrabSO2")
+#define REGISTRY_MAX_LETTERS _T("MAXLETTERS")
+#define REGISTRY_RHYTHM _T("RHYTHM")
+
+// Named Pipes
+#define PIPE_NAME _T("\\\\.\\pipe\\WordGame")
+
+// Shared Memory
+#define SHARED_MEM_NAME _T("WordGameSharedMemory")
+#define SHARED_MEM_SIZE 1024
+
+typedef struct {
+	TCHAR username[USERNAME_SIZE];
+	TCHAR text[WORD_SIZE];
+} Message;
+
+typedef struct {
+	TCHAR username[USERNAME_SIZE];
+	int points;
+	BOOL isBot;
+	HANDLE pipe;
+} Player;
+
+typedef struct {
+	Player players[MAX_PLAYERS];
+	int playerCount;
+	int terminate;
+	int maxLetters;
+	int rhythm;
+	int leaderIndex;
+} Game;
+
+typedef struct {
+	TCHAR letters[12];
+	int letterCount;
+	TCHAR lastWord[WORD_SIZE];
+	Player players[MAX_PLAYERS];
+	int playerCount;
+	BOOL isGameRunning;
+} SharedData;
+
+#endif // WORDGAME_H

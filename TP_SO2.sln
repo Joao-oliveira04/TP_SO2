@@ -5,6 +5,13 @@ VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Árbitro", "Árbitro\Árbitro.vcxproj", "{37927C76-C82F-42BA-9FDD-6664C1AACD88}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JogoUI", "JogoUI\JogoUI.vcxproj", "{EE2D610B-50C8-472D-A483-661F0ABEBB63}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Itens de Solução", "Itens de Solução", "{F22D51D9-23AF-4A89-A331-CB9EC5539272}"
+	ProjectSection(SolutionItems) = preProject
+		wordgame.h = wordgame.h
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +28,14 @@ Global
 		{37927C76-C82F-42BA-9FDD-6664C1AACD88}.Release|x64.Build.0 = Release|x64
 		{37927C76-C82F-42BA-9FDD-6664C1AACD88}.Release|x86.ActiveCfg = Release|Win32
 		{37927C76-C82F-42BA-9FDD-6664C1AACD88}.Release|x86.Build.0 = Release|Win32
+		{EE2D610B-50C8-472D-A483-661F0ABEBB63}.Debug|x64.ActiveCfg = Debug|x64
+		{EE2D610B-50C8-472D-A483-661F0ABEBB63}.Debug|x64.Build.0 = Debug|x64
+		{EE2D610B-50C8-472D-A483-661F0ABEBB63}.Debug|x86.ActiveCfg = Debug|Win32
+		{EE2D610B-50C8-472D-A483-661F0ABEBB63}.Debug|x86.Build.0 = Debug|Win32
+		{EE2D610B-50C8-472D-A483-661F0ABEBB63}.Release|x64.ActiveCfg = Release|x64
+		{EE2D610B-50C8-472D-A483-661F0ABEBB63}.Release|x64.Build.0 = Release|x64
+		{EE2D610B-50C8-472D-A483-661F0ABEBB63}.Release|x86.ActiveCfg = Release|Win32
+		{EE2D610B-50C8-472D-A483-661F0ABEBB63}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
