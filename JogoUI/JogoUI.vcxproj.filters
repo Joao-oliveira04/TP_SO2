@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="jodoui.c">
+    <ClCompile Include="jogoui.c">
       <Filter>Arquivos de Origem</Filter>
     </ClCompile>
   </ItemGroup>

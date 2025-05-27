@@ -1,10 +1,4 @@
 #include "../wordgame.h"
-#include <conio.h>
-#include <fcntl.h>  
-#include <io.h>     
-#include <stdio.h>
-#include <tchar.h>
-#include <windows.h>
 
 Player player;
 
@@ -24,6 +18,9 @@ void UserValidation(int argc, LPTSTR argv[]) {
 
 	_tcsncpy_s(player.username, USERNAME_SIZE, argv[1], USERNAME_SIZE - 1);
 	player.username[USERNAME_SIZE - 1] = '\0';
+	player.points = 0;
+	player.isBot = FALSE;
+	player.pipe = INVALID_HANDLE_VALUE;
 }
 
 void Cleanup() {
@@ -35,6 +32,46 @@ void HandleError(TCHAR* msg) {
 	_tprintf_s(_T("[ERROR] %s (%d)\n"), msg, GetLastError());
 	Cleanup();
 	exit(1);
+}
+
+void WriteMessage(Message* msg) {
+	OVERLAPPED overlapped = { 0 };
+	overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	/*
+	overlapped.hEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	ConnectNamedPipe(hPipe, &overlapped);
+	*/
+
+	if (!WriteFile(player.pipe, msg, sizeof(Message), NULL, &overlapped)) {
+		if (GetLastError() != ERROR_IO_PENDING)
+			HandleError(_T("WriteFile"));
+
+		WaitForSingleObject(overlapped.hEvent, INFINITE);
+	}
+
+	CloseHandle(overlapped.hEvent);
+}
+
+void ReadMessage(Message* msg) {
+	if (!ReadFile(player.pipe, msg, sizeof(Message), NULL, NULL)) {
+		Sleep(10);
+		HandleError(_T("ReadFile"));
+	}
+}
+
+BOOL HandleServerRequest() {
+	Message sent, received;
+	_tcscpy_s(sent.username, USERNAME_SIZE, player.username);
+	_tcscpy_s(sent.text, WORD_SIZE, _T("join"));
+
+	WriteMessage(&sent);
+
+	ReadMessage(&received);
+
+	if (_tcsicmp(received.text, _T("accepted")) != 0)
+		return FALSE;
+
+	return TRUE;
 }
 
 void ConnectToArbitro() {
@@ -54,18 +91,13 @@ void ConnectToArbitro() {
 	if (!SetNamedPipeHandleState(player.pipe, &mode, NULL, NULL))
 		HandleError(_T("SetNamedPipeHandleState"));
 
+	if (!HandleServerRequest()) {
+		_tprintf_s(_T("Server Denied Your Request...\n"));
+		Cleanup();
+		exit(0);
+	}
+
 	_tprintf_s(_T("Connected, Welcome %s!\n"), player.username);
-}
-
-void WriteMessage(Message* msg) {
-	if (!WriteFile(player.pipe, msg, sizeof(Message), NULL, NULL))
-		HandleError(_T("WriteFile"));
-}
-
-void ReadMessage(Message* msg) {
-	if (!ReadFile(player.pipe, msg, sizeof(Message), NULL, NULL))
-		HandleError(_T("ReadFile"));
-	_tprintf_s(_T("[%s]: '%s'\n"), msg->username, msg->text);
 }
 
 void HandleServerMessage(Message msg) {}
@@ -82,10 +114,27 @@ DWORD WINAPI ServerListenerThread() {
 			exit(0);
 		}
 
+		_tprintf_s(_T("[%s]: '%s'\n"), received.username, received.text);
 		HandleServerMessage(received);
 	}
+}
 
-	return 0;
+void InputToArbitro() {
+	Message sent, received;
+	_tcscpy_s(sent.username, USERNAME_SIZE, player.username);
+
+	while (1) {
+		_fgetts(sent.text, WORD_SIZE, stdin);
+		sent.text[_tcslen(sent.text) - 1] = '\0';
+
+		WriteMessage(&sent);
+
+		if (_tcsicmp(sent.text, _T("exit")) == 0) {
+			_tprintf_s(_T("Exiting Game...\n"));
+			Cleanup();
+			exit(0);
+		}
+	}
 }
 
 int _tmain(int argc, TCHAR* argv[]) {
@@ -105,21 +154,7 @@ int _tmain(int argc, TCHAR* argv[]) {
 	else
 		CloseHandle(hThread);
 
-	Message sent, received;
-	_tcscpy_s(sent.username, USERNAME_SIZE, player.username);
-
-	while (1) {
-		_fgetts(sent.text, WORD_SIZE, stdin);
-		sent.text[_tcslen(sent.text) - 1] = '\0';
-
-		WriteMessage(&sent);
-
-		if (_tcsicmp(sent.text, _T("exit")) == 0) {
-			_tprintf_s(_T("Exiting Game...\n"));
-			Cleanup();
-			exit(0);
-		}
-	}
+	InputToArbitro();
 
 	return 0;
 }
